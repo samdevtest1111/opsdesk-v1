@@ -9,7 +9,11 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// Routes placeholder
+// Routes
+const adminUserRoutes = require("./routes/adminUserRoutes");
+app.use("/api/admin", adminUserRoutes);
+
+// Root route
 app.get("/", (req, res) => {
   res.send("OpsDesk Backend Running 🚀");
 });
