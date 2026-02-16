@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const {
-  getAllUsers,
-  createUser,
-} = require("../controllers/adminUserController");
+const adminUserController = require("../controllers/adminUserController");
 
-router.get("/users", getAllUsers);
-router.post("/users", createUser);
+// Routes for admin user management
+router.post("/", adminUserController.createUser); // Create user
+router.get("/", adminUserController.getUsers); // Get all users
+router.put("/:id", adminUserController.updateUser); // Update user by ID
+router.delete("/:id", adminUserController.deleteUser); // Delete user by ID
 
 module.exports = router;
