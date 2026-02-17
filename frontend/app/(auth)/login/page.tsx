@@ -70,6 +70,13 @@ export default function LoginPage() {
         >
           {loading ? "Logging in..." : "Login"}
         </button>
+
+        <a
+          href="http://localhost:5000/api/auth/google"
+          className="w-full border flex items-center justify-center py-2 rounded hover:bg-gray-50"
+        >
+          Continue with Google
+        </a>
       </form>
     </main>
   );

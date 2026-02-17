@@ -55,7 +55,7 @@ const googleAuth = passport.authenticate("google", {
 });
 const googleCallback = passport.authenticate("google", {
   failureRedirect: "/login",
-  successRedirect: "/api/auth/success",
+  successRedirect: "http://localhost:3000/dashboard",
 });
 
 module.exports = { googleAuth, googleCallback };
