@@ -1,22 +1,23 @@
 const express = require("express");
 const router = express.Router();
-const { registerUser, loginUser } = require("../controllers/authController");
 const {
   googleAuth,
   googleCallback,
 } = require("../controllers/googleAuthController");
 
-// Regular auth routes
-router.post("/register", registerUser);
-router.post("/login", loginUser);
-
-// Google OAuth routes
+// Redirect user to Google for login
 router.get("/google", googleAuth);
+
+// Google callback URL
 router.get("/google/callback", googleCallback);
 
-// Optional success endpoint
+// Optional: success route to confirm login
 router.get("/success", (req, res) => {
-  res.send("Google login successful!");
+  if (req.user) {
+    res.json({ message: "Google login successful", user: req.user });
+  } else {
+    res.status(401).json({ message: "Not authenticated" });
+  }
 });
 
 module.exports = router;
