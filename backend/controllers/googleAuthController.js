@@ -50,8 +50,10 @@ const googleCallback = (req, res, next) => {
 
     res.cookie("auth_token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: false, // MUST be false for localhost
+      sameSite: "lax", // Use 'lax' for local dev redirects
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.redirect("http://localhost:3000/dashboard");
