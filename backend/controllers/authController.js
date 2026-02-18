@@ -1,8 +1,8 @@
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-// Register a new user
 const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
   try {
@@ -17,12 +17,10 @@ const registerUser = async (req, res) => {
 
     res.status(201).json({ message: "User registered", userId: user.id });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// Login user
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -33,9 +31,20 @@ const loginUser = async (req, res) => {
     if (!validPassword)
       return res.status(400).json({ message: "Invalid credentials" });
 
+    const token = jwt.sign(
+      { id: user.id, role: user.role || "user" },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" },
+    );
+
+    res.cookie("auth_token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+
     res.status(200).json({ message: "Login successful", userId: user.id });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };

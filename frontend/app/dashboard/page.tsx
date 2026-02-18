@@ -1,6 +1,5 @@
 "use client";
 
-import { apiFetch } from "@/src/lib/api";
 import { useEffect, useState } from "react";
 
 type Product = {
@@ -19,9 +18,13 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const apiUrl = "http://localhost:5000/api/products";
+
   const loadProducts = async () => {
     try {
-      const data = await apiFetch("/api/products");
+      const res = await fetch(apiUrl, { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch products");
+      const data: Product[] = await res.json();
       setProducts(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load products");
@@ -32,14 +35,15 @@ export default function DashboardPage() {
     loadProducts();
   }, []);
 
-  const createProduct = async (e: React.FormEvent<HTMLFormElement>) => {
+  const createProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
     try {
-      await apiFetch("/api/products", {
+      await fetch(apiUrl, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, price: Number(price), description }),
+        credentials: "include",
       });
       setName("");
       setPrice("");
@@ -55,13 +59,11 @@ export default function DashboardPage() {
   const updateProduct = async (p: Product) => {
     setLoading(true);
     try {
-      await apiFetch(`/api/products/${p.id}`, {
+      await fetch(`${apiUrl}/${p.id}`, {
         method: "PUT",
-        body: JSON.stringify({
-          name: p.name,
-          price: p.price,
-          description: p.description,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(p),
+        credentials: "include",
       });
       setEditingId(null);
       await loadProducts();
@@ -76,7 +78,10 @@ export default function DashboardPage() {
     if (!confirm("Delete this product?")) return;
     setLoading(true);
     try {
-      await apiFetch(`/api/products/${id}`, { method: "DELETE" });
+      await fetch(`${apiUrl}/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
       await loadProducts();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Delete failed");
@@ -87,9 +92,9 @@ export default function DashboardPage() {
 
   return (
     <main className="p-6 space-y-6">
-      <h1 className="text-2xl font-semibold">Products</h1>
+      <h1 className="text-2xl font-semibold">Products Dashboard</h1>
 
-      {/* Create */}
+      {/* Create Product Form */}
       <form
         onSubmit={createProduct}
         className="space-y-3 max-w-md border p-4 rounded"
@@ -125,7 +130,7 @@ export default function DashboardPage() {
         </button>
       </form>
 
-      {/* List */}
+      {/* Products List */}
       {products.length === 0 ? (
         <p>No products found</p>
       ) : (

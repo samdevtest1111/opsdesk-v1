@@ -5,10 +5,16 @@ const {
   googleAuth,
   googleCallback,
 } = require("../controllers/googleAuthController");
+const { authenticate } = require("../middleware/authMiddleware");
 
-// Regular auth routes
+// Auth routes
 router.post("/register", registerUser);
 router.post("/login", loginUser);
+
+// Protected route
+router.get("/me", authenticate, (req, res) => {
+  return res.json({ userId: req.user.id, role: req.user.role });
+});
 
 // Google OAuth routes
 router.get("/google", googleAuth);
