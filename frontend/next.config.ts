@@ -4,9 +4,15 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // @ts-expect-error - ESLint property naming conflict in NextConfig type
-  eslint: {
-    ignoreDuringBuilds: true,
+  // This tells Vercel: "If someone lands on the root, send them to login"
+  async redirects() {
+    return [
+      {
+        source: "/",
+        destination: "/login",
+        permanent: false,
+      },
+    ];
   },
 };
 
