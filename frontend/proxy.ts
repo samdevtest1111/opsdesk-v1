@@ -1,18 +1,19 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function middleware(req: NextRequest) {
-  // 🔹 Use 'auth_token' because that's what your backend is sending
+// Next.js 16 requires the function name 'proxy'
+export function proxy(req: NextRequest) {
   const token = req.cookies.get("auth_token")?.value;
+  const { pathname } = req.nextUrl;
 
-  // If trying to access dashboard without the token, redirect to login
-  if (!token && req.nextUrl.pathname.startsWith("/dashboard")) {
+  // Protect Dashboard: No token? Go to login.
+  if (!token && pathname.startsWith("/dashboard")) {
     const loginUrl = new URL("/login", req.url);
     return NextResponse.redirect(loginUrl);
   }
 
-  // If user has a token and tries to go to login, send them to dashboard
-  if (token && req.nextUrl.pathname === "/login") {
+  // Prevent Login page access: Have token? Go to dashboard.
+  if (token && pathname === "/login") {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
